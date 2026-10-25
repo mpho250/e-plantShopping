@@ -13,13 +13,16 @@ function App() {
       ) : (
         <div className="background-image">
           <div className="landing-content">
-            <h1>Welcome To Paradise Nursery</h1>
+            <h1>Welcome to Paradise Nursery</h1>
+
             <p>
               Discover beautiful plants to bring nature into your home.
             </p>
+
             <button onClick={() => setShowProductList(true)}>
               Get Started
             </button>
+
             <AboutUs />
           </div>
         </div>
