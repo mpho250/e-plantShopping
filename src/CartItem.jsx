@@ -1,72 +1,91 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItem, updateQuantity } from "./CartSlice";
+import { CartSlice } from "./CartSlice";
 
-export default function CartItem() {
+function CartItem({ onContinueShopping }) {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.cart.items);
 
-  const total = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const handleIncrement = (item) => {
+    dispatch(
+      CartSlice.actions.updateQuantity({
+        name: item.name,
+        quantity: item.quantity + 1
+      })
+    );
+  };
+
+  const handleDecrement = (item) => {
+    if (item.quantity > 1) {
+      dispatch(
+        CartSlice.actions.updateQuantity({
+          name: item.name,
+          quantity: item.quantity - 1
+        })
+      );
+    } else {
+      handleRemove(item);
+    }
+  };
+
+  const handleRemove = (item) => {
+    dispatch(CartSlice.actions.removeItem(item.name));
+  };
+
+  const total = items.reduce((sum, item) => {
+    const price = Number(String(item.cost).replace(/[^0-9.]/g, ""));
+    return sum + price * item.quantity;
+  }, 0);
 
   return (
-    <main className="shopping-cart">
-      <h1>Shopping Cart</h1>
+    <div className="cart-container">
+      <h1>Your Shopping Cart</h1>
 
       {items.length === 0 ? (
-        <p>Your cart is empty. Explore Paradise Nursery to find your plants!</p>
+        <p>Your cart is empty.</p>
       ) : (
         <>
           {items.map((item) => (
-            <article className="cart-item" key={item.id}>
-              <img
-                src={item.image}
-                alt={item.name}
-                className="cart-item-image"
-              />
+            <div className="cart-item" key={item.name}>
+              <img src={item.image} alt={item.name} />
 
               <div>
-                <h2>{item.name}</h2>
-                <p>Price: R{item.price.toFixed(2)}</p>
-                <p>
-                  Subtotal: R{(item.price * item.quantity).toFixed(2)}
-                </p>
+                <h3>{item.name}</h3>
+                <p>Unit Price: {item.cost}</p>
+                <p>Quantity: {item.quantity}</p>
 
-                <label>
-                  Quantity:
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(event) => {
-                      const quantity = Number(event.target.value);
-                      if (quantity >= 1) {
-                        dispatch(
-                          updateQuantity({ id: item.id, quantity })
-                        );
-                      }
-                    }}
-                  />
-                </label>
+                <button onClick={() => handleIncrement(item)}>+</button>
 
-                <button
-                  onClick={() => dispatch(removeItem(item.id))}
-                >
-                  Remove
-                </button>
+                <button onClick={() => handleDecrement(item)}>−</button>
+
+                <button onClick={() => handleRemove(item)}>Delete</button>
               </div>
-            </article>
+            </div>
           ))}
 
-          <h2>Total: R{total.toFixed(2)}</h2>
+          <h2>Cart Total: ${total.toFixed(2)}</h2>
         </>
       )}
 
-      <button onClick={() => (window.location.href = "/")}>
+      <button
+        onClick={() => window.alert("Checkout coming soon!")}
+      >
+        Checkout
+      </button>
+
+      <button
+        onClick={() => {
+          if (onContinueShopping) {
+            onContinueShopping();
+          } else {
+            window.location.href = "/";
+          }
+        }}
+      >
         Continue Shopping
       </button>
-    </main>
+    </div>
   );
 }
+
+export default CartItem;
