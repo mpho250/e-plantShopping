@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartSlice } from "../CartSlice";
 import "./ProductList.css";
@@ -41,8 +41,10 @@ const plantCategories = [
 
 function ProductList({ onHomeClick, onCartClick }) {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const [addedToCart, setAddedToCart] = useState({});
+
+  const cartItems = useSelector(
+    (state) => state.cart.items
+  );
 
   const totalItems = cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -50,42 +52,64 @@ function ProductList({ onHomeClick, onCartClick }) {
   );
 
   const totalCost = cartItems.reduce((total, item) => {
-    const price = Number(String(item.cost).replace(/[^0-9.]/g, ""));
+    const price = Number(
+      String(item.cost).replace(/[^0-9.]/g, "")
+    );
+
     return total + price * item.quantity;
   }, 0);
 
   const handleAddToCart = (plant) => {
-    dispatch(CartSlice.actions.addItem(plant));
-    setAddedToCart((previous) => ({
-      ...previous,
-      [plant.name]: true
-    }));
+    const alreadyInCart = cartItems.some(
+      (item) => item.name === plant.name
+    );
+
+    if (!alreadyInCart) {
+      dispatch(CartSlice.actions.addItem(plant));
+    }
   };
 
   return (
     <div className="product-list-container">
       <nav className="navbar">
-        <a href="#home" onClick={(event) => {
-          event.preventDefault();
-          if (onHomeClick) onHomeClick();
-        }}>
+        <a
+          href="#home"
+          onClick={(event) => {
+            event.preventDefault();
+            if (onHomeClick) onHomeClick();
+          }}
+        >
           Home
         </a>
 
-        <a href="#plants" onClick={(event) => {
-          event.preventDefault();
-          document.getElementById("plants")?.scrollIntoView({
-            behavior: "smooth"
-          });
-        }}>
+        <a
+          href="#plants"
+          onClick={(event) => {
+            event.preventDefault();
+            document.getElementById("plants")?.scrollIntoView({
+              behavior: "smooth"
+            });
+          }}
+        >
           Plants
         </a>
 
-        <a href="#cart" onClick={(event) => {
-          event.preventDefault();
-          if (onCartClick) onCartClick();
-        }}>
-          Cart ({totalItems})
+        <a
+          href="#cart"
+          onClick={(event) => {
+            event.preventDefault();
+            if (onCartClick) onCartClick();
+          }}
+          aria-label={`Shopping cart, ${totalItems} items`}
+        >
+          <span role="img" aria-label="Shopping cart">
+            🛒
+          </span>{" "}
+          Cart (
+          <span id="cart_quantity_count">
+            {totalItems}
+          </span>
+          )
         </a>
 
         <span>Total: ${totalCost.toFixed(2)}</span>
@@ -94,32 +118,48 @@ function ProductList({ onHomeClick, onCartClick }) {
       <h1 id="plants">Our Plants</h1>
 
       {plantCategories.map((category) => (
-        <section className="category-section" key={category.category}>
-          <h2 className="category-name">{category.category}</h2>
+        <section
+          className="category-section"
+          key={category.category}
+        >
+          <h2 className="category-name">
+            {category.category}
+          </h2>
 
           <div className="plants-grid">
-            {category.plants.map((plant) => (
-              <article className="plant-card" key={plant.name}>
-                <img
-                  src={plant.image}
-                  alt={plant.name}
-                  onError={(event) => {
-                    event.currentTarget.style.display = "none";
-                  }}
-                />
+            {category.plants.map((plant) => {
+              const addedToCart = cartItems.some(
+                (item) => item.name === plant.name
+              );
 
-                <h3>{plant.name}</h3>
-                <p>Price: {plant.cost}</p>
-
-                <button
-                  className="product-button"
-                  onClick={() => handleAddToCart(plant)}
-                  disabled={!!addedToCart[plant.name]}
+              return (
+                <article
+                  className="plant-card"
+                  key={plant.name}
                 >
-                  {addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
-                </button>
-              </article>
-            ))}
+                  <img
+                    src={plant.image}
+                    alt={plant.name}
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+
+                  <h3>{plant.name}</h3>
+                  <p>Price: {plant.cost}</p>
+
+                  <button
+                    className="product-button"
+                    onClick={() => handleAddToCart(plant)}
+                    disabled={addedToCart}
+                  >
+                    {addedToCart
+                      ? "Added to Cart"
+                      : "Add to Cart"}
+                  </button>
+                </article>
+              );
+            })}
           </div>
         </section>
       ))}
