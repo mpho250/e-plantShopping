@@ -1,20 +1,37 @@
-# e-plantShopping
+e-plantShopping
 
-## Project Description
-e-plantShopping is an online plant shopping application called Paradise Nursery.
+Project Description
 
-## Features
-- Browse plants in different categories.
-- View plant names, images, and prices.
-- Add plants to the shopping cart.
-- Update quantities and remove plants.
-- View the total cost of items in the cart.
+e-plantShopping is an online plant shopping application for Paradise Nursery. It allows users to browse different types of plants, view plant prices, add plants to a shopping cart, and manage their shopping selections.
 
-## Technologies Used
-- React
-- JavaScript
-- CSS
-- Redux Toolkit
+Features
 
-## Project Name
+Browse plants by category.
+
+View plant images, names, and prices.
+
+Add plants to the shopping cart.
+
+Increase or decrease plant quantities.
+
+Remove plants from the shopping cart.
+
+View the shopping cart total.
+
+Explore the Paradise Nursery landing page.
+
+Technologies Used
+
+React
+
+JavaScript
+
+CSS
+
+Redux Toolkit
+
+HTML
+
+Project Name
+
 e-plantShopping
